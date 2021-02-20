@@ -45,6 +45,12 @@ class Lock:
             elif characteristic.uuid == self.SECURE_READ_CHARACTERISTIC:
                 self.secure_session.set_read(characteristic)
 
+        response = self.peripheral.writeCharacteristic(26, b'\x02\x00', withResponse=True)
+        print("Subscription SEC request response: ",response)
+
+        response = self.peripheral.writeCharacteristic(21, b'\x02\x00', withResponse=True)
+        print("Subscription MCU request response: ",response)
+
         self.secure_session.set_key(self.key)
 
         handshake_keys = Cryptodome.Random.get_random_bytes(16)
