@@ -5,9 +5,23 @@ import json
 import time
 import argparse
 
+parser = argparse.ArgumentParser(description="Remotely control August locks.")
+parser.add_argument('lock', metavar='L', type=str, nargs='+', help="The lock's name or address")
+parser.add_argument('-c', '--config', type=str,
+                   default="config.json", help='Specify the configuration file')
+parser.add_argument('--lock', dest='action', action='store_const',
+                   const='lock', help='Lock the lock')
+parser.add_argument('--unlock', dest='action', action='store_const',
+                   const='unlock', help='Lock the lock')
+parser.add_argument('--status', dest='action', action='store_const',
+                   const='status', help='Request lock status')
+parser.set_defaults(action='status')
+
+args = parser.parse_args()
+
 config = None
 
-with open("config.json", "r") as config_file:
+with open(args.config, "r") as config_file:
     config = json.load(config_file)
 
 if type(config) is dict:
@@ -21,17 +35,6 @@ for lock_config in config:
         lock.set_name(lock_config["name"])
     locks.append(lock)
 
-parser = argparse.ArgumentParser(description="Remotely control August locks.")
-parser.add_argument('lock', metavar='L', type=str, nargs='+', help="The lock's name or address")
-parser.add_argument('--lock', dest='action', action='store_const',
-                   const='lock', help='Lock the lock')
-parser.add_argument('--unlock', dest='action', action='store_const',
-                   const='unlock', help='Lock the lock')
-parser.add_argument('--status', dest='action', action='store_const',
-                   const='status', help='Request lock status')
-parser.set_defaults(action='status')
-
-args = parser.parse_args()
 
 for lock in locks:
     if lock.name in args.lock:
